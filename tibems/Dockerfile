@@ -18,6 +18,6 @@ rm -rf /tmp/install/tibems /tmp/install/TIB_ems*.zip
 
 EXPOSE 7222
 
-WORKDIR /opt/tibco/ems/8.5/bin/
+WORKDIR /opt/tibco/ems/${EMS_VERSION}/bin/
 
 ENTRYPOINT ["./tibemsd", "-config", "../config/tibemsd.conf"]
