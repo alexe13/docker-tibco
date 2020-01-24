@@ -1,6 +1,6 @@
 Build, ship and run TIBCO Software using Docker 
 =================== 
-This repo contains changes to tibbase and tibems Dockerfiles, allowing to install arbitrary versions not depending on Tibco Universal Installer.
+This repo contains changes to tibbase and tibems Dockerfiles, allowing to install arbitrary versions of TIBCO EMS not depending on Tibco Universal Installer.
 
 I do not have any experience with other TIBCO products besided EMS, so I can not gurantee other Dockerfiles work as intended.
 
@@ -9,9 +9,9 @@ How to build Tibco EMS 8.5:
 ```bash 
 docker build -t tibbase:1.0.0 .
 ```
-2) Download desired TIBCO EMS distro as a .zip archive
-3) Change Dockerfile ARG values: EMS_VERSION to distro's version and FOLDER_NAME to name of a folder inside the .zip archive
-4) Optional step for SSL: place server and root certificates to /certs folder near the distro 
+2) Download desired TIBCO EMS distro as a .zip archive and place it in /tibems folder
+3) Change /tibems/Dockerfile ARG values: EMS_VERSION to distro's version and FOLDER_NAME to name of a folder inside the .zip archive
+4) Optional step for SSL: place server and root certificates to /certs folder next to the archive 
 5) Run 
 ```bash 
 docker build -t tibco:8.5 .
@@ -19,7 +19,7 @@ docker build -t tibco:8.5 .
 6) Optional step for SSL: run bash inside the conatiner and modify the conf/tibemsd.conf:
    * `docker run -it --entrypoint=bash tibco:8.5`
    * `nano ../confing/tibemsd.conf`
-   * modifiy ports to listen to and paths to certificates, which are copied to WORKDIR (/bin folder)
+   * modifiy ports to listen to and paths to certificates, which are copied to WORKDIR (/bin folder) if you did not skip step 4
    * save changes, exit the container and commit image: `docker commit <image id> tibco-ssl:8.5`
 7) To start the image, run: 
 ```bash
