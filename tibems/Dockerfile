@@ -2,17 +2,22 @@ FROM tibbase:1.0.0
 
 MAINTAINER Mike Schippers <info@mikeschippers.com>
 
-ADD TIB_ems*_linux_x86.zip /tmp/install/
+ARG EMS_VERSION=8.5
+ARG FOLDER_NAME=TIB_ems-ce_8.5.1
+ADD TIB_ems*.zip /tmp/install/
+COPY certs /tmp/install/certs/
 
 RUN unzip /tmp/install/TIB_ems*.zip -d /tmp/install/tibems/ && \
-sed -i 's/<entry key="environmentName">.*<\/entry>/<entry key="environmentName">DockerizedEnvironment<\/entry>/g' /tmp/install/tibems/TIBCOUniversalInstaller-ems.silent && \
-sed -i 's/<entry key="configDirectoryRoot">.*<\/entry>/<entry key="configDirectoryRoot">\/opt<\/entry>/g' /tmp/install/tibems/TIBCOUniversalInstaller-ems.silent && \
-sed -i 's/<entry key="feature_Development Kit_ems">.*<\/entry>/<entry key="feature_Development Kit_ems">false<\/entry>/g' /tmp/install/tibems/TIBCOUniversalInstaller-ems.silent && \
-sed -i 's/<entry key="feature_EMS Client Baseline_ems">.*<\/entry>/<entry key="feature_EMS Client Baseline_ems">false<\/entry>/g' /tmp/install/tibems/TIBCOUniversalInstaller-ems.silent && \
-sed -i 's/<entry key="feature_EMS Source_ems">.*<\/entry>/<entry key="feature_EMS Source_ems">false<\/entry>/g' /tmp/install/tibems/TIBCOUniversalInstaller-ems.silent && \
-/bin/bash /tmp/install/tibems/TIBCOUniversalInstaller-lnx-x86.bin -silent -is:javahome /usr/lib/jvm/java-7-openjdk-amd64/jre/ && \
+cd /tmp/install/tibems/${FOLDER_NAME} && \
+for f in tar/*; do tar -C / -xvf $f; done && \
+cp -r /opt/tibco/ems/${EMS_VERSION}/samples/config /opt/tibco/ems/${EMS_VERSION}/config && \
+mkdir /opt/tibco/ems/${EMS_VERSION}/bin/datastore && \
+cp -r /tmp/install/certs/. /opt/tibco/ems/${EMS_VERSION}/bin/ 2>/dev/null || : && \
+chmod -R 777 /opt/tibco && \
 rm -rf /tmp/install/tibems /tmp/install/TIB_ems*.zip
 
 EXPOSE 7222
 
-ENTRYPOINT ["/opt/tibco/ems/8.3/bin/tibemsd", "-config", "/opt/tibco/cfgmgmt/ems/data/tibemsd.conf"]
+WORKDIR /opt/tibco/ems/8.5/bin/
+
+ENTRYPOINT ["./tibemsd", "-config", "../config/tibemsd.conf"]
